@@ -22,15 +22,24 @@ body{background:var(--bg);color:var(--text)}
 [dir="rtl"] .badge{right:auto;left:-6px}
 .page{display:none;padding:16px;max-width:1000px;margin:auto}
 .page.active{display:block}
-.hero{text-align:center;padding:30px 10px 10px}
-.hero h1{font-size:1.6rem;margin-bottom:8px}
-.hero p{color:var(--muted);font-size:.92rem}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:18px 0}
-.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 8px;text-align:center;display:flex;flex-direction:column;gap:7px;align-items:center;min-height:150px;cursor:pointer}
-.cwrap{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:21px}
+.hero{text-align:center;padding:22px 10px 6px}
+.hero h1{font-size:1.5rem;margin-bottom:6px}
+.hero p{color:var(--muted);font-size:.88rem}
+/* ✅ الشبكة الجديدة: 3 فوق + الرابع في الوسط */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 6px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;min-height:128px;cursor:pointer;transition:transform .15s}
+.card:active{transform:scale(.97)}
+.card.center{grid-column:2}
+.cwrap{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex:none}
 .cwrap.g{background:rgba(16,185,129,.15)}.cwrap.o{background:rgba(245,158,11,.15)}.cwrap.b{background:rgba(59,130,246,.15)}
-.card h3{font-size:.85rem}.card p{color:var(--muted);font-size:.68rem}
-.link{color:var(--green);font-weight:700;cursor:pointer;font-size:.8rem}
+.card h3{font-size:.78rem;font-weight:700}
+.card p{color:var(--muted);font-size:.6rem;line-height:1.4}
+.link{color:var(--green);font-weight:700;cursor:pointer;font-size:.75rem}
+/* ✅ زر الرجوع العائم */
+.float-back{position:fixed;top:76px;z-index:35;width:50px;height:50px;border-radius:50%;background:#fff;border:none;box-shadow:0 2px 12px rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;cursor:pointer;left:16px}
+.float-back svg{width:24px;height:24px}
+[dir="rtl"] .float-back{left:auto;right:16px}
+[dir="rtl"] .float-back svg{transform:scaleX(-1)}
 h2.title,.mtitle{margin:14px 0 6px;font-weight:800}
 p.sub{color:var(--muted);margin-bottom:14px}
 .field{margin-bottom:12px}
@@ -100,7 +109,7 @@ th{color:var(--muted)}
 .notif-time{color:var(--muted);font-size:.68rem}
 .ocr-status{font-size:.73rem;margin-top:5px;min-height:1em}
 .lic-img{width:100%;border-radius:10px;border:1px solid var(--border)}
-@media(max-width:520px){.row2{grid-template-columns:1fr}}
+@media(max-width:520px){.row2{grid-template-columns:1fr}.cards{gap:6px}.card{min-height:112px}.cwrap{width:34px;height:34px;font-size:16px}.card h3{font-size:.7rem}.card p{font-size:.56rem}}
 </style>
 </head>
 <body>
@@ -115,13 +124,15 @@ th{color:var(--muted)}
   <button class="icon-btn" id="menuBtn">☰</button>
 </header>
 
+<button class="float-back" id="floatBack" onclick="goBack()" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg></button>
+
 <section class="page active" id="page-home">
   <div class="hero"><h1 data-i18n="hero_t"></h1><p data-i18n="hero_s"></p></div>
   <div class="cards">
     <div class="card" data-gate="list-form"><span class="cwrap g">📦</span><h3 data-i18n="c_list_t"></h3><p data-i18n="c_list_d"></p><span class="link" data-i18n="start"></span></div>
     <div class="card" data-gate="browse"><span class="cwrap o">🧭</span><h3 data-i18n="c_br_t"></h3><p data-i18n="c_br_d"></p><span class="link" data-i18n="start"></span></div>
     <div class="card" data-nav="map"><span class="cwrap b">🗺️</span><h3 data-i18n="c_map_t"></h3><p data-i18n="c_map_d"></p><span class="link" data-i18n="start"></span></div>
-    <div class="card" data-nav="reports"><span class="cwrap g">📊</span><h3 data-i18n="c_rep_t"></h3><p data-i18n="c_rep_d"></p><span class="link" data-i18n="start"></span></div>
+    <div class="card center" data-nav="reports"><span class="cwrap g">📊</span><h3 data-i18n="c_rep_t"></h3><p data-i18n="c_rep_d"></p><span class="link" data-i18n="start"></span></div>
   </div>
 </section>
 
@@ -272,19 +283,18 @@ function load(k,d){try{var v=JSON.parse(localStorage.getItem(k));return v==null?
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 function $(id){return document.getElementById(id)}
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
-var LANG=load('ms_lang','ar'),session=load('ms_session',null),staff=load('ms_staff',false),gpsPos=null,map=null,selId=null;
+var LANG=load('ms_lang','ar'),session=load('ms_session',null),staff=load('ms_staff',false),gpsPos=null,map=null,selId=null,currentPage='home';
 var listings=load('ms_listings',[{id:1,name:"Panadol Extra",sci:"Paracetamol",cat:"tablets",exp:"2026-12-01",qty:20,val:15000,pharmacy:"صيدلية الترياق",batch:"B12345",region:"بغداد",ocr:{exp:'demo'}}]);
 var users=load('ms_users',[{id:'u1',name:'صيدلية الترياق',lic:'9686',phone:'07700000000',email:'test@test.com',pass:'12345678',region:'بغداد',licStatus:'verified',role:'pharmacy'}]);
 var transfers=load('ms_transfers',[]),notifs=load('ms_notifs',[]);
 var RC={'بغداد':[33.31,44.36],'البصرة':[30.50,47.78],'نينوى':[36.34,43.13],'أربيل':[36.19,44.00],'السليمانية':[35.56,45.43],'الأنبار':[33.42,43.30],'بابل':[32.47,44.41],'ذي قار':[31.05,46.26],'كركوك':[35.46,44.39],'أخرى':[33.0,43.8]};
 
 var I18N={
-ar:{hero_t:"منصة تيسير تبادل فائض المخزون الدوائي",hero_s:"مطابقة آلية للإجازة والانتهاء • إشعارات فورية • تقارير وخريطة",c_list_t:"عرض فائض",c_list_d:"مع التحقق البصري الآلي من الإجازة والانتهاء.",c_br_t:"تصفح العروض",c_br_d:"الأدوية المتاحة للتبادل.",c_map_t:"الخريطة",c_map_d:"مواقع الصيدليات والعروض.",c_rep_t:"التقارير",c_rep_d:"إحصائيات وتصدير للرقابة.",start:"ابدأ ←",tab_login:"دخول",tab_signup:"إنشاء حساب",f_email:"البريد",f_pass:"كلمة المرور",login_btn:"تسجيل الدخول",f_phname:"اسم الصيدلية (كما بالوسط: صيدلية الترياق)",f_lic:"رقم الإجازة = العدد أعلى اليمين (٩٦٨٦)",f_phone:"الهاتف",f_region:"المحافظة",f_gps:"GPS",gps_btn:"تحديد موقعي",f_licphoto:"صورة الإجازة للمطابقة الآلية",upload_lic:"📜 ارفع صورة إجازة النقابة ⬆",private_sector_only:"⚠️ للأهلي الخاص فقط. الحكومي يُحظر حالياً.",tc_agree_text:"أقر: المنصة <b>وسيط تقني فقط</b>، والمسؤولية تنتقل لي عند توقيعي الرقمي على بروتوكول الاستلام.",create_btn:"إنشاء حساب وتأكيد الإقرار",list_t:"عرض فائض المخزون",list_s:"مطابقة آلية: الانتهاء بالصورة = المكتوب.",restrictions_note:"⛔ يُحظر: التبريد، المخدرة، أقل من 30 يوماً.",f_name:"الاسم التجاري",f_sci:"العلمي",f_cat:"الفئة",f_exp:"تاريخ الانتهاء",f_images:"الإثباتات البصرية",upload_med:"📷 صورة العبوة",upload_exp:"📷 صورة الانتهاء والـ Batch",f_qr:"QR (اختياري الآن)",f_qty:"الكمية",f_val:"القيمة (د.ع)",dist_agree_text:"أوافق أن النقل والفوترة عبر <b>شريك التوزيع المرخص</b> لاحقاً.",submit_list:"إدراج في النظام",browse_t:"سوق التيسير",search_ph:"ابحث...",modal_transfer_title:"📜 بروتوكول التبادل والتوقيع الرقمي",m_item:"العنصر:",m_batch:"التشغيلة:",m_val:"القيمة:",receiver_ack:"<b>إقرار المستلم:</b> فحصتُ الدواء شخصياً وتأكدت من التشغيلة والانتهاء، وأتحمل المسؤولية الكاملة من لحظة توقيعي.",i_acknowledge:"أوقع رقمياً وأتحمل المسؤولية.",confirm_transfer:"تأكيد وإصدار السند",inv_t:"سند التبادل الرقمي",inv_id:"السند:",inv_date:"التاريخ:",inv_from:"من:",inv_to:"إلى:",inv_sig:"بصمة التوقيع:",inv_val:"القيمة:",close:"حفظ وإغلاق",menu_h:"القائمة",menu_home:"الرئيسية",menu_list:"عرض فائض",menu_browse:"تصفح",menu_map:"الخريطة",menu_reports:"التقارير",menu_admin:"لوحة المشرف",logout:"خروج",rep_t:"التقارير الإحصائية",by_cat:"حسب الفئة",by_region:"حسب المحافظة",recent_tr:"آخر التبادلات",export_btn:"تصدير CSV",map_t:"الخريطة الجغرافية",map_s:"مواقع الصيدليات",notif_t:"الإشعارات الفورية",notif_enable:"تفعيل (تصل والموقع مغلق)",test_notif:"تجربة",admin_t:"لوحة المشرف",admin_s:"الموافقة على الإجازات غير المطابقة",view_lic:"عرض الإجازة",approve:"✅ موافقة وتوثيق",st_list:"عروض",st_tr:"تبادلات",st_val:"قيمة متبادلة",st_saved:"مساحة موفرة",ocr_check:"🔍 فحص بصري...",ocr_lic_ok:"✅ مطابقة: العدد ٩٦٨٦ والاسم متطابقان",ocr_lic_part:"⚠️ مطابقة جزئية — مراجعة يدوية",ocr_lic_no:"⛔ عدم مطابقة — راجع البيانات",ocr_exp_ok:"✅ الانتهاء مطابق للصورة",ocr_exp_no:"⚠️ الانتهاء غير مطابق — للمراجعة",gps_ok:"✅ تم التحديد",gps_no:"⚠️ سيُستخدم مركز المحافظة",notif_new:"💊 دواء جديد",notif_tr:"✅ تبادل موثق",notif_exp:"⏰ تنبيه انتهاء",email_dup:"البريد مسجل مسبقاً",bad_login:"بيانات الدخول غير صحيحة"},
-en:{hero_t:"Pharma Surplus Facilitation",hero_s:"Auto-match license & expiry • instant alerts • reports & map",c_list_t:"List Surplus",c_list_d:"With visual auto-verification.",c_br_t:"Browse",c_br_d:"Available medicines.",c_map_t:"Map",c_map_d:"Pharmacy locations.",c_rep_t:"Reports",c_rep_d:"Stats & export.",start:"Start →",tab_login:"Login",tab_signup:"Sign up",f_email:"Email",f_pass:"Password",login_btn:"Log in",f_phname:"Pharmacy name (as centered)",f_lic:"License no. = top-right number (9686)",f_phone:"Phone",f_region:"Governorate",f_gps:"GPS",gps_btn:"Get location",f_licphoto:"License photo for auto-match",upload_lic:"📜 Upload license ",private_sector_only:"⚠️ Private sector only.",tc_agree_text:"I agree: platform is a <b>tech facilitator only</b>; liability transfers on my digital signature.",create_btn:"Create & agree",list_t:"List Surplus",list_s:"Auto-match: photo expiry = entered.",restrictions_note:"⛔ No cold-chain, narcotics, <30 days.",f_name:"Trade name",f_sci:"Scientific",f_cat:"Category",f_exp:"Expiry",f_images:"Visual proofs",upload_med:"📷 Pack photo",upload_exp:"📷 Expiry photo",f_qr:"QR (optional)",f_qty:"Qty",f_val:"Value (IQD)",dist_agree_text:"Transport via <b>licensed distributor</b> later.",submit_list:"Submit",browse_t:"Facilitation Market",search_ph:"Search...",modal_transfer_title:"📜 Exchange Protocol",m_item:"Item:",m_batch:"Batch:",m_val:"Value:",receiver_ack:"<b>Receiver:</b> I inspected the medicine personally and assume full liability.",i_acknowledge:"I sign & accept liability.",confirm_transfer:"Confirm & issue",inv_t:"Digital Transfer Record",inv_id:"#",inv_date:"Date:",inv_from:"From:",inv_to:"To:",inv_sig:"Sig hash:",inv_val:"Value:",close:"Save",menu_h:"Menu",menu_home:"Home",menu_list:"List",menu_browse:"Browse",menu_map:"Map",menu_reports:"Reports",menu_admin:"Supervisor",logout:"Logout",rep_t:"Reports",by_cat:"By category",by_region:"By governorate",recent_tr:"Latest transfers",export_btn:"Export CSV",map_t:"Map",map_s:"Pharmacy locations",notif_t:"Notifications",notif_enable:"Enable (arrive when closed)",test_notif:"Test",admin_t:"Supervisor",admin_s:"Approve mismatched licenses",view_lic:"View license",approve:"✅ Approve",st_list:"Offers",st_tr:"Transfers",st_val:"Value",st_saved:"Saved",ocr_check:"🔍 OCR...",ocr_lic_ok:"✅ Number 9686 & name matched",ocr_lic_part:"⚠️ Partial — manual review",ocr_lic_no:"⛔ Mismatch",ocr_exp_ok:"✅ Expiry matches",ocr_exp_no:"⚠️ Expiry mismatch",gps_ok:"✅ OK",gps_no:"⚠️ Using center",notif_new:"💊 New medicine",notif_tr:"✅ Transfer done",notif_exp:"⏰ Expiry alert",email_dup:"Email already registered",bad_login:"Invalid credentials"}};
+ar:{hero_t:"منصة تيسير تبادل فائض المخزون الدوائي",hero_s:"مطابقة آلية للإجازة والانتهاء • إشعارات فورية • تقارير وخريطة",c_list_t:"عرض فائض",c_list_d:"مع التحقق البصري الآلي.",c_br_t:"تصفح العروض",c_br_d:"الأدوية المتاحة.",c_map_t:"الخريطة",c_map_d:"مواقع الصيدليات.",c_rep_t:"التقارير",c_rep_d:"إحصائيات وتصدير.",start:"ابدأ ←",tab_login:"دخول",tab_signup:"إنشاء حساب",f_email:"البريد",f_pass:"كلمة المرور",login_btn:"تسجيل الدخول",f_phname:"اسم الصيدلية (كما بالوسط)",f_lic:"رقم الإجازة = العدد أعلى اليمين (٩٦٦)",f_phone:"الهاتف",f_region:"المحافظة",f_gps:"GPS",gps_btn:"تحديد موقعي",f_licphoto:"صورة الإجازة للمطابقة الآلية",upload_lic:"📜 ارفع صورة إجازة النقابة ⬆",private_sector_only:"⚠️ للأهلي الخاص فقط. الحكومي يُحظر حالياً.",tc_agree_text:"أقر: المنصة <b>وسيط تقني فقط</b>، والمسؤولية تنتقل لي عند توقيعي الرقمي.",create_btn:"إنشاء حساب وتأكيد الإقرار",list_t:"عرض فائض المخزون",list_s:"مطابقة آلية: الانتهاء بالصورة = المكتوب.",restrictions_note:"⛔ يُحظر: التبريد، المخدرة، أقل من 30 يوماً.",f_name:"الاسم التجاري",f_sci:"العلمي",f_cat:"الفئة",f_exp:"تاريخ الانتهاء",f_images:"الإثباتات البصرية",upload_med:"📷 صورة العبوة",upload_exp:"📷 صورة الانتهاء والـ Batch",f_qr:"QR (اختياري الآن)",f_qty:"الكمية",f_val:"القيمة (د.ع)",dist_agree_text:"أوافق أن النقل والفوترة عبر <b>شريك التوزيع المرخص</b> لاحقاً.",submit_list:"إدراج في النظام",browse_t:"سوق التيسير",search_ph:"ابحث...",modal_transfer_title:"📜 بروتوكول التبادل والتوقيع الرقمي",m_item:"العنصر:",m_batch:"التشغيلة:",m_val:"القيمة:",receiver_ack:"<b>إقرار المستلم:</b> فحصتُ الدواء شخصياً وأتحمل المسؤولية الكاملة من لحظة توقيعي.",i_acknowledge:"أوقع رقمياً وأتحمل المسؤولية.",confirm_transfer:"تأكيد وإصدار السند",inv_t:"سند التبادل الرقمي",inv_id:"السند:",inv_date:"التاريخ:",inv_from:"من:",inv_to:"إلى:",inv_sig:"بصمة التوقيع:",inv_val:"القيمة:",close:"حفظ وإغلاق",menu_h:"القائمة",menu_home:"الرئيسية",menu_list:"عرض فائض",menu_browse:"تصفح",menu_map:"الخريطة",menu_reports:"التقارير",menu_admin:"لوحة المشرف",logout:"خروج",rep_t:"التقارير الإحصائية",by_cat:"حسب الفئة",by_region:"حسب المحافظة",recent_tr:"آخر التبادلات",export_btn:"تصدير CSV",map_t:"الخريطة الجغرافية",map_s:"مواقع الصيدليات",notif_t:"الإشعارات الفورية",notif_enable:"تفعيل (تصل والموقع مغلق)",test_notif:"تجربة",admin_t:"لوحة المشرف",admin_s:"الموافقة على الإجازات غير المطابقة",view_lic:"عرض الإجازة",approve:"✅ موافقة وتوثيق",st_list:"عروض",st_tr:"تبادلات",st_val:"قيمة متبادلة",st_saved:"مساحة موفرة",ocr_check:"🔍 فحص بصري...",ocr_lic_ok:"✅ مطابقة: العدد ٩٦٨٦ والاسم متطابقان",ocr_lic_part:"⚠️ مطابقة جزئية — مراجعة يدوية",ocr_lic_no:"⛔ عدم مطابقة — راجع البيانات",ocr_exp_ok:"✅ الانتهاء مطابق للصورة",ocr_exp_no:"⚠️ الانتهاء غير مطابق — للمراجعة",gps_ok:"✅ تم التحديد",gps_no:"⚠️ سيُستخدم مركز المحافظة",notif_new:"💊 دواء جديد",notif_tr:"✅ تبادل موثق",email_dup:"البريد مسجل مسبقاً",bad_login:"بيانات الدخول غير صحيحة"},
+en:{hero_t:"Pharma Surplus Facilitation",hero_s:"Auto-match license & expiry • instant alerts • reports & map",c_list_t:"List Surplus",c_list_d:"Visual auto-verification.",c_br_t:"Browse",c_br_d:"Available medicines.",c_map_t:"Map",c_map_d:"Pharmacy locations.",c_rep_t:"Reports",c_rep_d:"Stats & export.",start:"Start →",tab_login:"Login",tab_signup:"Sign up",f_email:"Email",f_pass:"Password",login_btn:"Log in",f_phname:"Pharmacy name (as centered)",f_lic:"License no. = top-right number (9686)",f_phone:"Phone",f_region:"Governorate",f_gps:"GPS",gps_btn:"Get location",f_licphoto:"License photo for auto-match",upload_lic:"📜 Upload license ",private_sector_only:"⚠️ Private sector only.",tc_agree_text:"I agree: platform is a <b>tech facilitator only</b>; liability transfers on my digital signature.",create_btn:"Create & agree",list_t:"List Surplus",list_s:"Auto-match: photo expiry = entered.",restrictions_note:"⛔ No cold-chain, narcotics, <30 days.",f_name:"Trade name",f_sci:"Scientific",f_cat:"Category",f_exp:"Expiry",f_images:"Visual proofs",upload_med:"📷 Pack photo",upload_exp:"📷 Expiry photo",f_qr:"QR (optional)",f_qty:"Qty",f_val:"Value (IQD)",dist_agree_text:"Transport via <b>licensed distributor</b> later.",submit_list:"Submit",browse_t:"Facilitation Market",search_ph:"Search...",modal_transfer_title:"📜 Exchange Protocol",m_item:"Item:",m_batch:"Batch:",m_val:"Value:",receiver_ack:"<b>Receiver:</b> I inspected the medicine personally and assume full liability.",i_acknowledge:"I sign & accept liability.",confirm_transfer:"Confirm & issue",inv_t:"Digital Transfer Record",inv_id:"#",inv_date:"Date:",inv_from:"From:",inv_to:"To:",inv_sig:"Sig hash:",inv_val:"Value:",close:"Save",menu_h:"Menu",menu_home:"Home",menu_list:"List",menu_browse:"Browse",menu_map:"Map",menu_reports:"Reports",menu_admin:"Supervisor",logout:"Logout",rep_t:"Reports",by_cat:"By category",by_region:"By governorate",recent_tr:"Latest transfers",export_btn:"Export CSV",map_t:"Map",map_s:"Pharmacy locations",notif_t:"Notifications",notif_enable:"Enable (arrive when closed)",test_notif:"Test",admin_t:"Supervisor",admin_s:"Approve mismatched licenses",view_lic:"View license",approve:"✅ Approve",st_list:"Offers",st_tr:"Transfers",st_val:"Value",st_saved:"Saved",ocr_check:"🔍 OCR...",ocr_lic_ok:"✅ Number 9686 & name matched",ocr_lic_part:"⚠️ Partial — manual review",ocr_lic_no:"⛔ Mismatch",ocr_exp_ok:"✅ Expiry matches",ocr_exp_no:"⚠️ Expiry mismatch",gps_ok:"✅ OK",gps_no:"⚠️ Using center",notif_new:"💊 New medicine",notif_tr:"✅ Transfer done",email_dup:"Email already registered",bad_login:"Invalid credentials"}};
 function t(k){return (I18N[LANG][k]||k)}
 
 function normDigits(s){return String(s).replace(/[\u0660-\u0669]/g,function(d){return String(d.charCodeAt(0)-1632)}).replace(/[\u06F0-\u06F9]/g,function(d){return String(d.charCodeAt(0)-1776)})}
-
 function fallbackHash(str){var h=5381;for(var i=0;i<str.length;i++)h=((h<<5)+h+str.charCodeAt(i))|0;return 'fb_'+(h>>>0).toString(16)+'_'+str.length}
 function sha256(str){
   if(window.crypto&&crypto.subtle){
@@ -292,12 +302,10 @@ function sha256(str){
   }
   return Promise.resolve(fallbackHash(str));
 }
-
 function ocrImage(file,cb){
   if(!window.Tesseract)return Promise.resolve({text:'',ok:false});
   return Tesseract.recognize(file,'ara+eng',{logger:function(m){if(m.status==='recognizing text'&&cb)cb(Math.round(m.progress*100))}}).then(function(r){return{text:r.data.text||'',ok:true}}).catch(function(){return{text:'',ok:false}});
 }
-
 function matchLicense(text,lic,name){
   var d=normDigits(text).replace(/\D/g,'');
   var ld=normDigits(lic).replace(/\D/g,'');
@@ -308,7 +316,6 @@ function matchLicense(text,lic,name){
   if(licOK||nameOK)return 'partial';
   return 'review';
 }
-
 function matchExpiry(text,exp){
   var y=+exp.slice(0,4),mo=+exp.slice(5,7);
   var n=normDigits(text),f=[],m;
@@ -320,7 +327,6 @@ function matchExpiry(text,exp){
   for(var j=0;j<f.length;j++){if(f[j][0]===y)return 'partial';}
   return 'review';
 }
-
 function compressImage(file,maxW,q){
   maxW=maxW||800;q=q||0.55;
   return new Promise(function(res,rej){
@@ -343,7 +349,6 @@ function compressImage(file,maxW,q){
     r.readAsDataURL(file);
   });
 }
-
 function fileToDataUrl(f){return new Promise(function(r){var x=new FileReader();x.onload=function(e){r(e.target.result)};x.readAsDataURL(f)})}
 
 function pushNotify(title,body){
@@ -566,25 +571,24 @@ function initMap(){
   });
 }
 
-function toggleLang(){LANG=LANG==='ar'?'en':'ar';save('ms_lang',LANG);applyLang()}
-function applyLang(){
-  document.documentElement.lang=LANG;
-  document.documentElement.dir=LANG==='ar'?'rtl':'ltr';
-  document.querySelectorAll('[data-i18n]').forEach(function(el){el.textContent=t(el.dataset.i18n)});
-  document.querySelectorAll('[data-i18n-html]').forEach(function(el){el.innerHTML=t(el.dataset.i18nHtml)});
-  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){el.placeholder=t(el.dataset.i18nPh)});
-  $('langBtn').textContent=LANG==='ar'?'EN':'ع';
-  renderMarket();
-}
-function show(p){
+/* ✅ التنقل + زر الرجوع + زر رجوع الهاتف */
+function show(p,fromHistory){
   document.querySelectorAll('.page').forEach(function(x){x.classList.remove('active')});
   var el=$('page-'+p);if(el)el.classList.add('active');
   closeDrawers();window.scrollTo(0,0);
+  currentPage=p;
+  var fb=$('floatBack');if(fb)fb.style.display=(p==='home')?'none':'flex';
   if(p==='browse')renderMarket();
   if(p==='reports')renderReports();
   if(p==='map')setTimeout(initMap,120);
   if(p==='admin')renderAdmin();
+  if(!fromHistory){try{window.history.pushState({page:p},'','#'+p);}catch(e){}}
 }
+function goBack(){try{window.history.back();}catch(e){show('home',true);}}
+window.addEventListener('popstate',function(e){
+  if(e.state&&e.state.page){show(e.state.page,true);}else{show('home',true);}
+});
+
 function gate(p){if(session){show(p)}else{show('auth')}}
 function switchTab(x){
   $('tabLogin').classList.toggle('active',x==='login');
@@ -600,10 +604,21 @@ document.querySelectorAll('[data-nav]').forEach(function(el){el.onclick=function
 document.querySelectorAll('[data-gate]').forEach(function(el){el.onclick=function(){gate(el.dataset.gate)}});
 $('themeBtn').onclick=function(){var h=document.documentElement;h.dataset.theme=h.dataset.theme==='dark'?'light':'dark';$('themeBtn').textContent=h.dataset.theme==='dark'?'☀️':'🌙'};
 ['bSearch','bCat','bSort'].forEach(function(i){$(i).addEventListener('input',renderMarket)});
+function toggleLang(){LANG=LANG==='ar'?'en':'ar';save('ms_lang',LANG);applyLang()}
+function applyLang(){
+  document.documentElement.lang=LANG;
+  document.documentElement.dir=LANG==='ar'?'rtl':'ltr';
+  document.querySelectorAll('[data-i18n]').forEach(function(el){el.textContent=t(el.dataset.i18n)});
+  document.querySelectorAll('[data-i18n-html]').forEach(function(el){el.innerHTML=t(el.dataset.i18nHtml)});
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){el.placeholder=t(el.dataset.i18nPh)});
+  $('langBtn').textContent=LANG==='ar'?'EN':'ع';
+  renderMarket();
+}
 function updateConn(){var on=navigator.onLine,b=$('connStatus');b.textContent=on?(LANG==='ar'?'متصل':'Online'):(LANG==='ar'?'غير متصل':'Offline');b.className='status-badge '+(on?'status-online':'status-offline')}
 window.addEventListener('online',updateConn);
 window.addEventListener('offline',updateConn);
 if('serviceWorker'in navigator&&location.protocol.startsWith('http')){navigator.serviceWorker.register('sw.js').catch(function(){})}
+try{window.history.replaceState({page:'home'},'','');}catch(e){}
 applyLang();updateConn();renderNotifBadge();
 if(session)show('home');
 $('lExp').min=new Date(Date.now()+30*864e5).toISOString().split('T')[0];
