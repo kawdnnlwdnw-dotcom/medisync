@@ -284,7 +284,18 @@ window.addEventListener('error',function(e){var b=document.getElementById('errBa
 // ==========================================
 const SUPABASE_URL = 'https://lkkitqyaxjptrsgtgzyy.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_SZjrBTNvYuPCAPKFCn0pBw_ovvSY_YM';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let supabase = null;
+try {
+  if (window.supabase && window.supabase.createClient) {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  } else {
+    var eb = document.getElementById('errBanner');
+    if (eb) { eb.style.display='block'; eb.textContent='⚠️ تعذّر تحميل مكتبة الاتصال (Supabase). قد يكون الإنترنت بطيئاً أو الـ CDN محجوباً. حدّث الصفحة.'; }
+  }
+} catch(e) {
+  var eb2 = document.getElementById('errBanner');
+  if (eb2) { eb2.style.display='block'; eb2.textContent='⚠️ فشل تهيئة الاتصال: '+e.message; }
+}
 // ==========================================
 var SUP_CODE='SUP-9686';
 function load(k,d){try{var v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}}
